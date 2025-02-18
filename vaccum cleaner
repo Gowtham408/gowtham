@@ -1,0 +1,72 @@
+import random
+
+# Define the environment
+class Room:
+    def _init_(self, name, grid_size):
+        self.name = name
+        self.grid_size = grid_size
+        self.grid = [[random.choice(['dusty', 'clean']) for _ in range(grid_size)] for _ in range(grid_size)]
+        self.robot_position = (0, 0)  # Starting position of the robot
+
+    def display_grid(self):
+        for row in self.grid:
+            print(' '.join(row))
+        print()
+
+# Define the vacuum cleaner robot
+class VacuumCleaner:
+    def _init_(self):
+        self.current_room = None
+
+    def move(self, direction):
+        x, y = self.current_room.robot_position
+        if direction == 'up' and x > 0:
+            x -= 1
+        elif direction == 'down' and x < self.current_room.grid_size - 1:
+            x += 1
+        elif direction == 'left' and y > 0:
+            y -= 1
+        elif direction == 'right' and y < self.current_room.grid_size - 1:
+            y += 1
+        self.current_room.robot_position = (x, y)
+
+    def clean(self):
+        x, y = self.current_room.robot_position
+        if self.current_room.grid[x][y] == 'dusty':
+            print(f"Cleaning position ({x}, {y}) in {self.current_room.name}...")
+            self.current_room.grid[x][y] = 'clean'
+
+    def scan_and_clean(self):
+        x, y = self.current_room.robot_position
+        if self.current_room.grid[x][y] == 'dusty':
+            self.clean()
+        else:
+            print(f"Position ({x}, {y}) in {self.current_room.name} is already clean.")
+
+    def move_to_room(self, room):
+        print(f"Moving to {room.name}...")
+        self.current_room = room
+
+# Create rooms
+room_A = Room("Room A", 5)
+room_B = Room("Room B", 5)
+
+# Initialize the vacuum cleaner
+vacuum = VacuumCleaner()
+
+# Example simulation
+# Move to Room A and clean
+vacuum.move_to_room(room_A)
+vacuum.current_room.display_grid()
+for _ in range(10):  # Example: 10 random moves
+    vacuum.scan_and_clean()
+    vacuum.move(random.choice(['up', 'down', 'left', 'right']))
+vacuum.current_room.display_grid()
+
+# Move to Room B and clean
+vacuum.move_to_room(room_B)
+vacuum.current_room.display_grid()
+for _ in range(10):  # Example: 10 random moves
+    vacuum.scan_and_clean()
+    vacuum.move(random.choice(['up', 'down', 'left', 'right']))
+vacuum.current_room.display_grid()
