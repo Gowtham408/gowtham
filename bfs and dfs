@@ -1,0 +1,100 @@
+from collections import deque
+
+class Node:
+    def _init_(self, state, parent=None):  
+        self.state = state
+        self.parent = parent
+        self.children = []
+
+    def path(self):
+        """ Returns the path from initial state to this node. """
+        current = self
+        path = []
+        while current:
+            path.append(current.state)
+            current = current.parent
+        return path[::-1]  # Reverse to get correct order
+
+
+def bfs(initial_state, goal_state, neighbors_func):
+    """ Implements BFS to find the shortest path from initial_state to goal_state """
+    root = Node(initial_state)  
+    queue = deque([root])
+    visited = {initial_state}
+
+    while queue:
+        node = queue.popleft()
+
+        if node.state == goal_state:
+            return node.path(), root  
+
+        for neighbor in neighbors_func(node.state):
+            if neighbor not in visited:
+                visited.add(neighbor)
+                child = Node(neighbor, node)
+                node.children.append(child)
+                queue.append(child)
+
+    return None, root  
+
+
+def dfs(initial_state, goal_state, neighbors_func):
+    """ Implements DFS to find a path from initial_state to goal_state """
+    root = Node(initial_state)  
+    stack = [root]
+    visited = {initial_state}
+
+    while stack:
+        node = stack.pop()
+
+        if node.state == goal_state:
+            return node.path(), root  
+
+        for neighbor in reversed(neighbors_func(node.state)):  
+            if neighbor not in visited:
+                visited.add(neighbor)
+                child = Node(neighbor, node)
+                node.children.append(child)
+                stack.append(child)
+
+    return None, root  
+
+
+def neighbors(state):
+    """ Defines the graph structure using an adjacency list """
+    graph = {
+        'A': ['B', 'C'],
+        'B': ['D', 'E'],
+        'C': ['F'],
+        'D': [],
+        'E': ['F'],
+        'F': []
+    }
+    return graph.get(state, [])
+
+
+def print_tree(node, level=0):
+    """ Recursively prints the traversal tree """
+    if node:
+        print('  ' * level + node.state)
+        for child in node.children:
+            print_tree(child, level + 1)
+
+
+# Define Initial and Goal States
+initial_state = 'A'
+goal_state = 'F'
+
+# Run BFS
+print("BFS Search:")
+bfs_result, bfs_root = bfs(initial_state, goal_state, neighbors)
+print("BFS Path:", bfs_result)
+print("\nBFS Tree:")
+print_tree(bfs_root)
+
+# Run DFS
+print("\nDFS Search:")
+dfs_result, dfs_root = dfs(initial_state, goal_state, neighbors)
+print("DFS Path:", dfs_result)
+print("\nDFS Tree:")
+print_tree(dfs_root)
